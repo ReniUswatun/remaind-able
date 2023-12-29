@@ -1,58 +1,75 @@
 "use client";
+import { register } from "@/lib/auth";
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignupPage() {
-  const [user, setUser] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [user, setUser] = useState("Rizal Dwi Anggoro");
+  const [email, setEmail] = useState("rizaldwianggoro@email.com");
+  const [password, setPassword] = useState("rizal123");
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const router = useRouter();
 
   const signup = () => {
-    const data = localStorage.getItem("accounts");
-    let account = [];
-    if (data) {
-      account = JSON.parse(data);
-      if (!user && !email && !password && !emailRegex.test(email)) {
-        alert("Please ensure all fields are filled");
-        return;
-      }
-      // linear search
-      let isExists = false;
-      for (let a = 0; a < account.length; a++) {
-        if (account[a].email == email) {
-          isExists = true;
-          break;
-        }
-      }
-      if (isExists) {
-        console.log("Gagal register, email sudah terdaftar!");
-        alert("Failed to register, email is already registered");
-        return;
-      }
+    console.log({ user, email, password });
+    // validasi input
+    if (!user && !email && !password && !emailRegex.test(email)) {
+      alert("Please ensure all fields are filled");
     }
-    // Membuat Account Baru
-    const newAccount = {
-      user,
-      email,
-      password,
-    };
-    // menambahkan user baru ke array
-    account.push(newAccount);
 
-    // simpan array ke local storage
-    localStorage.setItem("accounts", JSON.stringify(account));
-    let key = `${email}`;
-    localStorage.setItem(key, null);
-    router.push("/login");
+    const result = register(user, email, password);
+    if (result.success) {
+      router.replace("/login");
+    } else {
+      console.log(result.message);
+    }
   };
+
+  // const signup = () => {
+  //   const data = localStorage.getItem("accounts");
+  //   let account = [];
+  //   if (data) {
+  //     account = JSON.parse(data);
+  //     if (!user && !email && !password && !emailRegex.test(email)) {
+  //       alert("Please ensure all fields are filled");
+  //       return;
+  //     }
+  //     // linear search
+  //     let isExists = false;
+  //     for (let a = 0; a < account.length; a++) {
+  //       if (account[a].email == email) {
+  //         isExists = true;
+  //         break;
+  //       }
+  //     }
+  //     if (isExists) {
+  //       console.log("Gagal register, email sudah terdaftar!");
+  //       alert("Failed to register, email is already registered");
+  //       return;
+  //     }
+  //   }
+  //   // Membuat Account Baru
+  //   const newAccount = {
+  //     user,
+  //     email,
+  //     password,
+  //   };
+  //   // menambahkan user baru ke array
+  //   account.push(newAccount);
+
+  //   // simpan array ke local storage
+  //   localStorage.setItem("accounts", JSON.stringify(account));
+  //   let key = `${email}`;
+  //   localStorage.setItem(key, null);
+  //   router.push("/login");
+  // };
+
   return (
     <>
       <div className="bg-gradient-to-r from-violet-600 via-indigo-800 to-violet-600 flex items-center justify-center h-screen">
         <div className="w-full max-w-sm my-auto mx-auto p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-indigo-200 dark:border-indigo-700">
-          <form className="space-y-6" action="#">
+          <div className="space-y-6">
             <h5 className="text-xl font-medium text-indigo-1000 dark:text-indigo">
               Sign Up to our platform
             </h5>
@@ -125,7 +142,6 @@ export default function SignupPage() {
             </div>
             <button
               onClick={signup}
-              type="submit"
               className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Register
@@ -138,7 +154,7 @@ export default function SignupPage() {
                 Back To Login
               </Link>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </>
