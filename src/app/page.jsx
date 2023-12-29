@@ -35,7 +35,7 @@ export default function HomePage() {
 
   return (
     <>
-      <NavbarComponent />
+      <NavbarComponent session={session} />
     </>
   );
 }

@@ -1,27 +1,23 @@
-import { MoonIcon } from "./MoonIcon.jsx";
-import { SunIcon } from "./SunIcon.jsx";
-import { Button, Switch, VisuallyHidden, useSwitch } from "@nextui-org/react";
+"use client";
+
+import { Button } from "@nextui-org/react";
 import { useTheme } from "next-themes";
-import React, { useEffect } from "react";
+import { MoonIcon } from "./MoonIcon";
+import { SunIcon } from "./SunIcon";
 
-const ThemeSwitch = (props) => {
-  const { Component, isSelected, getBaseProps, getInputProps } =
-    useSwitch(props);
+export default function ThemeSwitch() {
+  const { setTheme, theme } = useTheme();
 
-  const { themes, setTheme } = useTheme();
+  const switchTheme = () => {
+    if (theme == "light") setTheme("dark");
+    else setTheme("light");
+  };
+
   return (
-    <div className="flex flex-col gap-2">
-      <Component {...getBaseProps()}>
-        <VisuallyHidden>
-          <input {...getInputProps()} />
-        </VisuallyHidden>
-        <Button variant="flat" color="secondary">
-          {isSelected ? <MoonIcon /> : <SunIcon />}
-          {setTheme(isSelected ? "dark" : "light")}
-        </Button>
-      </Component>
-    </div>
+    <>
+      <Button isIconOnly onClick={() => switchTheme()}>
+        {theme == "light" ? <MoonIcon /> : <SunIcon />}
+      </Button>
+    </>
   );
-};
-
-export { ThemeSwitch };
+}

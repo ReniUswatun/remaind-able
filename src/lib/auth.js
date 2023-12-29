@@ -56,7 +56,7 @@ const checkAuthentication = (email, password) => {
   }
 };
 
-const createAccount = (username, email, password) => {
+const createAccount = (user, email, password) => {
   const accounts = readAllAccount();
 
   // melakukan linear search disini
@@ -76,7 +76,7 @@ const createAccount = (username, email, password) => {
     };
   }
 
-  accounts.push({ username, email, password });
+  accounts.push({ user, email, password });
   saveAccounts(accounts);
   createNewUser(email);
 
@@ -102,4 +102,4 @@ const createNewUser = (email) => {
   localStorage.setItem(keyNewUser, []);
 };
 
-export { getSession, checkAuthentication, createAccount, logout };
+export { checkAuthentication, createAccount, getSession, logout };
