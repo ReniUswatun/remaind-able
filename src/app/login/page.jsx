@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="bg-gradient-to-r from-violet-600 via-indigo-800 to-violet-600 flex items-center justify-center h-screen ">
+      <div className="bg-gradient-to-r from-violet-600 via-indigo-800 to-violet-600 flex items-center justify-center h-screen">
         <div className="w-full max-w-sm my-auto mx-auto p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-indigo-200 dark:border-indigo-700">
           <div className="space-y-6">
             <h5 className="text-xl font-medium text-indigo-1000 dark:text-indigo">

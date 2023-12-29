@@ -12,7 +12,6 @@ export default function SignupPage() {
   const router = useRouter();
 
   const signup = () => {
-    const data = localStorage.getItem("accounts");
     // validasi input
     if (!user || !email || !password || !emailRegex.test(email)) {
       alert("Please ensure all fields are filled");

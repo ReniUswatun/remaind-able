@@ -39,7 +39,7 @@ const checkAuthentication = (email, password) => {
     localStorage.setItem(
       keySession,
       JSON.stringify({
-        username: accounts[index].username,
+        user: accounts[index].user,
         email: accounts[index].email,
       })
     );
