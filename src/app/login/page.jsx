@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { checkAuthentication } from "@/lib/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -9,43 +10,19 @@ export default function LoginPage() {
   const router = useRouter();
 
   const login = () => {
-    if (!email && !password) {
-      alert("Please ensure all fields are filled");
-      console.log("data belum dimasukkan");
-      return;
-    }
-    const data = localStorage.getItem("accounts");
-    let account = [];
-    if (data) {
-      account = JSON.parse(data);
-
-      //linear search
-      for (let a = 0; a < account.length; a++) {
-        if (account[a].email == email) {
-          if (account[a].password == password) {
-            console.log("Success");
-            //disini logic kalo sukses
-            router.push("/dashboard");
-          } else {
-            alert("Wrong password");
-            console.log("Password salah");
-          }
-          return;
-        }
-      }
-      alert("email not found");
-      console.log("Email tidak ditemukan!");
+    const result = checkAuthentication(email, password);
+    if (result.isSuccess) {
+      return router.replace("/");
     } else {
-      console.log("Data tidak ada");
-      return;
+      console.log(result.message);
     }
   };
 
   return (
     <>
-      <div className="bg-gradient-to-r from-violet-600 via-indigo-800 to-violet-600 flex items-center justify-center h-screen">
+      <div className="bg-gradient-to-r from-violet-600 via-indigo-800 to-violet-600 flex items-center justify-center h-screen ">
         <div className="w-full max-w-sm my-auto mx-auto p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-indigo-200 dark:border-indigo-700">
-          <form className="space-y-6" action="#">
+          <div className="space-y-6">
             <h5 className="text-xl font-medium text-indigo-1000 dark:text-indigo">
               Login to our platform
             </h5>
@@ -111,7 +88,7 @@ export default function LoginPage() {
                 Create account
               </Link>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </>
