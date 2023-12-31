@@ -26,26 +26,8 @@ export default function NavbarComponent() {
     <>
       <Navbar>
         <NavbarBrand>
-          <p className="font-bold text-inherit">RemainAble</p>
+          <p className="font-bold text-xl text-inherit">RemainAble</p>
         </NavbarBrand>
-
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Features
-            </Link>
-          </NavbarItem>
-          <NavbarItem isActive>
-            <Link href="#" aria-current="page" color="secondary">
-              Customers
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Integrations
-            </Link>
-          </NavbarItem>
-        </NavbarContent>
 
         <NavbarContent as="div" justify="end">
           <ThemeSwitch />
