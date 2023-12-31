@@ -64,6 +64,7 @@ export default function HomePage() {
 
   return (
     <>
+<<<<<<< HEAD
       <NavbarComponent />
 
       <div className="rid grid-cols-2">
@@ -208,6 +209,9 @@ export default function HomePage() {
           </Tabs>
         </div>
       </div>
+=======
+      <NavbarComponent session={session} />
+>>>>>>> d80dfef6b36ee88f0919f71a8fd6dd3f88f880b4
     </>
   );
 }

@@ -102,4 +102,4 @@ const createNewUser = (email) => {
   localStorage.setItem(keyNewUser, []);
 };
 
-export { getSession, checkAuthentication, createAccount, logout };
+export { checkAuthentication, createAccount, getSession, logout };
