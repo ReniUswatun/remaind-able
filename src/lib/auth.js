@@ -90,10 +90,14 @@ const logout = () => {
 };
 
 const getSession = () => {
-  const data = localStorage.getItem(keySession);
-  if (data) {
-    return JSON.parse(data);
+  if (typeof window !== "undefined") {
+    // Check for browser environment
+    const data = localStorage.getItem(keySession);
+    if (data) {
+      return JSON.parse(data);
+    }
   }
+
   return null;
 };
 

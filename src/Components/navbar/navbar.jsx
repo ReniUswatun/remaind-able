@@ -1,23 +1,21 @@
 "use client";
 
-import { logout } from "@/lib/auth.js";
+import { getSession, logout } from "@/lib/auth.js";
 import {
   Avatar,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Link,
   Navbar,
   NavbarBrand,
   NavbarContent,
-  NavbarItem,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import ThemeSwitch from "./toogle-theme";
+import { ThemeSwitch } from "./toogle-theme";
 
-export default function NavbarComponent({ session }) {
-  console.log({ session });
+export default function NavbarComponent() {
+  const session = getSession();
 
   const router = useRouter();
 

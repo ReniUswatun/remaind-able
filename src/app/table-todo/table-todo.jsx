@@ -12,14 +12,10 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@nextui-org/react";
-import React from "react";
 
 import { readAllTodo } from "@/lib/task";
 import { getSession } from "@/lib/auth.js";
 import { VerticalDotsIcon } from "@/Components/VerticalDotIcon";
-
-const session = getSession();
-const rows = readAllTodo(session.email);
 
 const statusColorMapComp = {
   easy: "success",
@@ -61,6 +57,8 @@ const columns = [
 ];
 
 export default function TodoTask() {
+  const session = getSession();
+  const dataTodo = readAllTodo(session.email);
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 
@@ -131,7 +129,7 @@ export default function TodoTask() {
             <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No rows to display."} items={rows}>
+        <TableBody emptyContent={"No rows to display."} items={dataTodo}>
           {(item) => (
             <TableRow key={item.key}>
               {(columnKey) => (

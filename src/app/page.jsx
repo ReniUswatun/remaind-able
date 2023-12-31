@@ -1,7 +1,7 @@
 "use client";
 
-import NavbarComponent from "@/Components/navbar/navbar";
-import { getSession } from "@/lib/auth";
+import NavbarComponent from "@/Components/navbar/navbar.jsx";
+import { getSession } from "@/lib/auth.js";
 import {
   Button,
   Card,
@@ -23,6 +23,7 @@ import { PlusIcon } from "../Components/PlusIcon.jsx";
 import { Input } from "@nextui-org/react";
 
 export default function HomePage() {
+  const [tasks, setTasks] = useState([]);
   const [isGettingSessionInfo, setIsGettingSessionInfo] = useState(true);
   const [session, setSession] = useState();
   const router = useRouter();
@@ -32,7 +33,28 @@ export default function HomePage() {
   const [deadline, setDeadline] = useState(null);
   const [timeSpent, setTimeSpent] = useState(0);
   const [complexity, setComplexity] = useState(0);
+  const [score, setScore] = useState(0);
 
+  const handleSubmit = () => {
+    // Create a new task object
+    const newTask = {
+      nameTask,
+      deadline,
+      timeSpent,
+      complexity,
+      score,
+    };
+
+    // Update the tasks array with the new task
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+
+    // Reset the form state (optional)
+    setNameTask("");
+    setDeadline("");
+    setTimeSpent("");
+    setComplexity(0);
+    setScore(0);
+  };
   // component mounted, atau mulai sisi client
   useEffect(() => {
     // intinya, buat cek apakah local storage udah ready atau belum
@@ -64,7 +86,6 @@ export default function HomePage() {
 
   return (
     <>
-<<<<<<< HEAD
       <NavbarComponent />
 
       <div className="rid grid-cols-2">
@@ -143,16 +164,44 @@ export default function HomePage() {
                     startContent={
                       <div className="flex items-center">
                         <label className="sr-only" htmlFor="currency">
-                          Currency
+                          Complexity
                         </label>
                         <select
-                          className="outline-none border-0 bg-transparent text-default-400 text-small"
-                          id="currency"
-                          name="currency"
+                          className="outline-none border-0 bg-transparent text-default-900 text-small"
+                          id="complexity"
+                          name="complexity"
+                          value={complexity}
+                          onChange={(c) => setComplexity(c.target.value)}
                         >
-                          <option>Easy</option>
-                          <option>Moderate</option>
-                          <option>Difficult</option>
+                          <option value={0}>Easy</option>
+                          <option value={1}>Moderate</option>
+                          <option value={2}>Difficult</option>
+                        </select>
+                      </div>
+                    }
+                  />
+                  <Input
+                    isRequired
+                    key="inside"
+                    color="secondary"
+                    label="Score"
+                    variant="faded"
+                    labelPlacement="inside"
+                    startContent={
+                      <div className="flex items-center">
+                        <label className="sr-only" htmlFor="currency">
+                          Score
+                        </label>
+                        <select
+                          className="outline-none border-0 bg-transparent text-default-900 text-small"
+                          id="score"
+                          name="score"
+                          value={score}
+                          onChange={(s) => setScore(s.target.value)}
+                        >
+                          <option value={0}>Low</option>
+                          <option value={1}>Medium</option>
+                          <option value={2}>High</option>
                         </select>
                       </div>
                     }
@@ -209,9 +258,6 @@ export default function HomePage() {
           </Tabs>
         </div>
       </div>
-=======
-      <NavbarComponent session={session} />
->>>>>>> d80dfef6b36ee88f0919f71a8fd6dd3f88f880b4
     </>
   );
 }
