@@ -24,6 +24,8 @@ export default function NavbarComponent() {
     router.replace("/login");
   };
 
+  console.log(session);
+
   return (
     <>
       <Navbar>
@@ -34,7 +36,7 @@ export default function NavbarComponent() {
         <NavbarContent as="div" justify="end">
           <ThemeSwitch />
           <p className="font text-inherit">
-            Halo, {session.user.split(" ")[0]}
+            Halo, {session.username.split(" ")[0]}
           </p>
           <Dropdown placement="bottom-end">
             <DropdownTrigger>

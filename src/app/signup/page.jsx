@@ -5,19 +5,14 @@ import { useRouter } from "next/navigation";
 import { createAccount } from "@/lib/auth";
 
 export default function SignupPage() {
-  const [user, setUser] = useState("");
+  const [username, setUser] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const router = useRouter();
 
   const signup = () => {
-    // validasi input
-    if (!user || !email || !password || !emailRegex.test(email)) {
-      alert("Please ensure all fields are filled");
-    }
-
-    const result = createAccount(user, email, password);
+    const result = createAccount(username, email, password);
     if (result.isSuccess) {
       router.replace("/login");
     } else {
@@ -42,7 +37,7 @@ export default function SignupPage() {
               <div className="grid grid-cols-12 items-center gap-1">
                 <img src="./person.png" alt="" className="max-w-full h-auto" />
                 <input
-                  value={user}
+                  value={username}
                   onChange={(u) => setUser(u.target.value)}
                   type="name"
                   name="name"

@@ -39,7 +39,7 @@ const checkAuthentication = (email, password) => {
     localStorage.setItem(
       keySession,
       JSON.stringify({
-        user: accounts[index].user,
+        username: accounts[index].username,
         email: accounts[index].email,
       })
     );
@@ -56,11 +56,20 @@ const checkAuthentication = (email, password) => {
   }
 };
 
-const createAccount = (user, email, password) => {
+const createAccount = (username, email, password) => {
   const accounts = readAllAccount();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   // melakukan linear search disini
   let isExists = false;
+  if (!email || !username || !password || !emailRegex.test(email)) {
+    // validasi input
+    alert("Please ensure all fields are filled");
+    return {
+      isSuccess: false,
+      message: "Email tidak sesuai dengan pola",
+    };
+  }
   for (let a = 0; a < accounts.length; a++) {
     if (accounts[a].email == email) {
       isExists = true;
@@ -76,7 +85,7 @@ const createAccount = (user, email, password) => {
     };
   }
 
-  accounts.push({ user, email, password });
+  accounts.push({ username, email, password });
   saveAccounts(accounts);
   createNewUser(email);
 

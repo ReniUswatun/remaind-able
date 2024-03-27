@@ -18,26 +18,54 @@ import {
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import TodoTask from "./table-todo/table-todo.jsx";
 import { PlusIcon } from "../Components/PlusIcon.jsx";
 import { Input } from "@nextui-org/react";
+import { addTodo, deleteTodo, editTodo, readAllTodo } from "@/lib/todo.js";
+import TableTodo from "@/Components/table-todo/table-todo.jsx";
+import StatusTable from "@/Components/status-tabel.jsx";
+import DeadlineTable from "@/Components/deadline-table.jsx";
+import { SearchIcon } from "@/Components/SearchIcon.jsx";
+import KnapsackFractionalTable from "@/Components/fractional-knapsack-table.jsx";
 
 export default function HomePage() {
+  const [selected, setSelected] = React.useState("status");
   const [tasks, setTasks] = useState([]);
   const [isGettingSessionInfo, setIsGettingSessionInfo] = useState(true);
   const [session, setSession] = useState();
   const router = useRouter();
-  const [selected, setSelected] = React.useState("status");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [nameTask, setNameTask] = useState("");
-  const [deadline, setDeadline] = useState(null);
+  const [deadline, setDeadline] = useState("");
   const [timeSpent, setTimeSpent] = useState(0);
   const [complexity, setComplexity] = useState(0);
   const [score, setScore] = useState(0);
+  const [editingTask, setEditingTask] = useState(null);
+  const [capacityKnapsack, setCapacityKnapsack] = useState(0);
 
+  // onClick to delete
+  const onClickButtonDelete = (item) => {
+    const deleteResult = deleteTodo(session.email, item.key);
+    if (deleteResult.success) {
+      const readResult = readAllTodo(session.email);
+      if (readResult.success) {
+        setTasks(readResult.todos);
+      }
+    }
+  };
+
+  const onClickButtonEdit = (item) => {
+    setEditingTask(item);
+    setNameTask(item.nameTask);
+    setDeadline(item.deadline);
+    setTimeSpent(item.timeSpent);
+    setComplexity(item.complexity);
+    setScore(item.score);
+    onOpen();
+  };
   const handleSubmit = () => {
     // Create a new task object
     const newTask = {
+      key: new Date().toISOString(),
       nameTask,
       deadline,
       timeSpent,
@@ -45,17 +73,62 @@ export default function HomePage() {
       score,
     };
 
-    // Update the tasks array with the new task
-    setTasks((prevTasks) => [...prevTasks, newTask]);
+    console.log(newTask);
+    const result = addTodo(session.email, newTask);
+    if (result.success) {
+      // Update the tasks array with the new task
+      setTasks((prevTasks) => [...prevTasks, newTask]);
+    }
 
-    // Reset the form state (optional)
     setNameTask("");
     setDeadline("");
-    setTimeSpent("");
+    setTimeSpent(0);
     setComplexity(0);
     setScore(0);
+    setEditingTask(null);
   };
+
+  const handleEditSubmit = () => {
+    // Update the existing task in the tasks array
+    const editedTask = {
+      ...editingTask,
+      nameTask,
+      deadline,
+      timeSpent,
+      complexity,
+      score,
+    };
+
+    const updatedTasks = editTodo(session.email, editingTask.key, editedTask);
+    if (updatedTasks.success) {
+      const readTodo = readAllTodo(session.email);
+      if (readTodo.success) {
+        setTasks(readTodo.todos);
+      }
+    }
+
+    // Reset form state
+    setNameTask("");
+    setDeadline("");
+    setTimeSpent(0);
+    setComplexity(0);
+    setScore(0);
+    setEditingTask(null);
+
+    // Close the modal
+    onOpenChange(false);
+  };
+
   // component mounted, atau mulai sisi client
+  useEffect(() => {
+    if (session) {
+      const resultReadAllTodos = readAllTodo(session.email);
+      if (resultReadAllTodos.success) {
+        setTasks(resultReadAllTodos.todos);
+      }
+    }
+  }, [session]);
+
   useEffect(() => {
     // intinya, buat cek apakah local storage udah ready atau belum
 
@@ -65,7 +138,6 @@ export default function HomePage() {
     // setelah berhasil mendapatkan info sesi
     setIsGettingSessionInfo(false);
   }, []);
-
   if (isGettingSessionInfo) {
     return (
       <>
@@ -92,10 +164,14 @@ export default function HomePage() {
         <h1 className="col-span-2 text-center text-3xl font-semibold leading-loose text-purple-900 dark:text-white">
           Assigment List
         </h1>
-        <hr class="w-60 h-1 mx-auto my-2 bg-purple-900 border-0 rounded md:my-4 dark:bg-purple-600"></hr>
+        <hr className="w-60 h-1 mx-auto my-2 bg-purple-900 border-0 rounded md:my-4 dark:bg-purple-600"></hr>
       </div>
       <div className="flex mx-24 max-w-300px md:max-w-800px">
-        <TodoTask />
+        <TableTodo
+          items={tasks}
+          onClickButtonEdit={onClickButtonEdit}
+          onClickButtonDelete={onClickButtonDelete}
+        />
       </div>
       <div className="flex mx-24 mt-4">
         <Button
@@ -116,12 +192,11 @@ export default function HomePage() {
             {(onClose) => (
               <>
                 <ModalHeader className="flex flex-col gap-1">
-                  Add Task
+                  {editingTask ? "Edit Task" : "Add Task"}
                 </ModalHeader>
                 <ModalBody>
                   <Input
                     isRequired
-                    key="inside"
                     type="name"
                     color="secondary"
                     label="Name Task"
@@ -131,7 +206,6 @@ export default function HomePage() {
                   />
                   <Input
                     isRequired
-                    key="inside"
                     type="date"
                     color="secondary"
                     label="Deadline"
@@ -143,20 +217,18 @@ export default function HomePage() {
                   />
                   <Input
                     isRequired
-                    key="inside"
                     type="number"
                     color="secondary"
-                    label="Time Spent"
+                    label="Time Spent (Hours)"
                     variant="faded"
                     labelPlacement="inside"
                     placeholder="0"
                     min="0"
                     value={timeSpent}
-                    onChange={(t) => setTimeSpent(t.target.value)}
+                    onChange={(t) => setTimeSpent(Number(t.target.value))}
                   />
                   <Input
                     isRequired
-                    key="inside"
                     color="secondary"
                     label="Complexity"
                     variant="faded"
@@ -171,7 +243,9 @@ export default function HomePage() {
                           id="complexity"
                           name="complexity"
                           value={complexity}
-                          onChange={(c) => setComplexity(c.target.value)}
+                          onChange={(c) =>
+                            setComplexity(Number(c.target.value))
+                          }
                         >
                           <option value={0}>Easy</option>
                           <option value={1}>Moderate</option>
@@ -182,7 +256,6 @@ export default function HomePage() {
                   />
                   <Input
                     isRequired
-                    key="inside"
                     color="secondary"
                     label="Score"
                     variant="faded"
@@ -197,7 +270,7 @@ export default function HomePage() {
                           id="score"
                           name="score"
                           value={score}
-                          onChange={(s) => setScore(s.target.value)}
+                          onChange={(s) => setScore(Number(s.target.value))}
                         >
                           <option value={0}>Low</option>
                           <option value={1}>Medium</option>
@@ -208,8 +281,19 @@ export default function HomePage() {
                   />
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="secondary" onPress={onClose}>
-                    Submit
+                  <Button
+                    color="secondary"
+                    onPress={() => {
+                      if (editingTask) {
+                        handleEditSubmit();
+                      } else {
+                        handleSubmit();
+                      }
+                      // Close the modal after submit
+                      onClose();
+                    }}
+                  >
+                    {editingTask ? "Update" : "Submit"}
                   </Button>
                 </ModalFooter>
               </>
@@ -220,7 +304,6 @@ export default function HomePage() {
       <div className="mx-24 mt-6">
         <div className="flex w-full flex-col items-center">
           <Tabs
-            aria-label="Options"
             selectedKey={selected}
             onSelectionChange={setSelected}
             color="secondary"
@@ -228,32 +311,42 @@ export default function HomePage() {
             variant="underlined"
           >
             <Tab key="status" title="Status">
-              <Card>
-                <CardBody>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat.
-                </CardBody>
-              </Card>
+              <div className="flex">
+                <StatusTable userEmail={session.email} />
+              </div>
             </Tab>
             <Tab key="deadline" title="Deadline">
-              <Card>
-                <CardBody>
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                  irure dolor in reprehenderit in voluptate velit esse cillum
-                  dolore eu fugiat nulla pariatur.
-                </CardBody>
-              </Card>
+              <div className="flex">
+                <DeadlineTable userEmail={session.email} />
+              </div>
             </Tab>
             <Tab key="knapsackFractional" title="Kanpsack Fractional">
-              <Card>
-                <CardBody>
-                  Excepteur sint occaecat cupidatat non proident, sunt in culpa
-                  qui officia deserunt mollit anim id est laborum.
-                </CardBody>
-              </Card>
+              <div>
+                <Input
+                  color="secondary"
+                  variant="faded"
+                  placeholder="0"
+                  min="0"
+                  type="number"
+                  label="Time Available"
+                  labelPlacement="outside"
+                  value={capacityKnapsack}
+                  onChange={(ca) =>
+                    setCapacityKnapsack(Number(ca.target.value))
+                  }
+                  endContent={
+                    <div className="pointer-events-none flex items-center ">
+                      <span className="text-default-400 text-small">Hours</span>
+                    </div>
+                  }
+                />
+                <div className="mt-6">
+                  <KnapsackFractionalTable
+                    userEmail={session.email}
+                    capacity={capacityKnapsack}
+                  />
+                </div>
+              </div>
             </Tab>
           </Tabs>
         </div>
